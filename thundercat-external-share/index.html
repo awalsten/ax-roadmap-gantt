@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thundercat External Share Mockups</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .logo {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            color: white;
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #1f2937;
+        }
+
+        .card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .card-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #eff6ff;
+            color: #1e40af;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-box h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #1f2937;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-box li {
+            padding: 8px 0;
+            color: #4b5563;
+            font-size: 14px;
+            display: flex;
+            align-items: start;
+            gap: 8px;
+        }
+
+        .info-box li::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .jira-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            margin-top: 24px;
+            transition: background 0.2s;
+        }
+
+        .jira-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 48px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🐱</div>
+            <h1>Thundercat External Share</h1>
+            <p class="subtitle">Interactive Mockups for Epic AX-1425</p>
+            <a href="https://frontgatetickets.atlassian.net/browse/AX-1425" class="jira-link" target="_blank">
+                <span>📋</span>
+                <span>View Jira Epic AX-1425</span>
+            </a>
+        </div>
+
+        <div class="cards-grid">
+            <a href="./thundercat-external-share-complete.html" class="card">
+                <div class="card-icon">🔒</div>
+                <h2>External Client View</h2>
+                <p>Experience what external clients see when they access a shared dashboard.</p>
+                <span class="card-badge">PIN: 1234</span>
+            </a>
+
+            <a href="./thundercat-share-dashboard-modal.html" class="card">
+                <div class="card-icon">📊</div>
+                <h2>Share Dashboard Modal</h2>
+                <p>See how admins generate and share links from within the dashboard.</p>
+                <span class="card-badge">Admin View</span>
+            </a>
+
+            <a href="./thundercat-link-management-page.html" class="card">
+                <div class="card-icon">⚙️</div>
+                <h2>Link Management</h2>
+                <p>Explore the complete link management interface for tracking and revoking access.</p>
+                <span class="card-badge">Admin View</span>
+            </a>
+        </div>
+
+        <div class="info-box">
+            <h3>✨ Features Implemented</h3>
+            <ul>
+                <li>AX-1426: Generate External Shareable Link with filter capture</li>
+                <li>AX-1427: Link Expiration (28-day default)</li>
+                <li>AX-1428: Link Revocation capabilities</li>
+                <li>AX-1429: Optional PIN/Password Protection</li>
+                <li>AX-1430: Link Management Page</li>
+                <li>AX-1431: Link Sharing via Email and Copy</li>
+                <li>AX-1432: Audit Tracking metadata</li>
+                <li>AX-1433: URL Protection with non-predictable IDs</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>Created by Annaliese Walsten • July 2026</p>
+            <p>For questions, contact: annaliese.walsten@frontgatetickets.com</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Dashboard - Modal Mockup</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+            color: #1f2937;
+        }
+
+        /* Header */
+        .top-header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #1f2937;
+            clip-path: polygon(0% 50%, 25% 0%, 50% 50%, 25% 100%);
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 16px;
+        }
+
+        .sidebar-header {
+            padding: 10px 16px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-header:hover {
+            background: #f3f4f6;
+        }
+
+        .sidebar-submenu {
+            margin-left: 16px;
+        }
+
+        .sidebar-item {
+            padding: 10px 16px;
+            font-size: 14px;
+            color: #4b5563;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: background 0.2s;
+        }
+
+        .sidebar-item:hover {
+            background: #f3f4f6;
+        }
+
+        .sidebar-item.active {
+            background: #f3f4f6;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 32px 40px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+
+        /* Metric Card */
+        .metric-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 56px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .chart-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .download-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .legend-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        .custom-legend {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 200px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #4b5563;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .legend-item:hover {
+            background: #f9fafb;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .share-button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+
+        .share-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Filters */
+        .filters-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .filter-select {
+            padding: 10px 36px 10px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .date-range-display {
+            padding: 10px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 320px;
+        }
+
+        .clear-link {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            padding: 10px 8px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        /* Modal */
+        .modal {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 24px 24px 16px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-section {
+            margin-bottom: 24px;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-hint {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 6px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .pin-input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pin-digit {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .pin-toggle {
+            margin-bottom: 12px;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #1e40af;
+            margin-bottom: 16px;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .captured-filters {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+        }
+
+        .captured-filters .filter-tag {
+            display: inline-block;
+            background: white;
+            border: 1px solid #d1d5db;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        /* Generated Link Section */
+        .link-generated {
+            background: #f0fdf4;
+            border: 2px solid #86efac;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .link-generated.show {
+            display: block;
+        }
+
+        .link-generated h3 {
+            color: #166534;
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .link-display {
+            background: white;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #166534;
+            word-break: break-all;
+            margin-bottom: 12px;
+        }
+
+        .link-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn.copied {
+            background: #10b981 !important;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .tab-group {
+            display: flex;
+            gap: 4px;
+            background: #f3f4f6;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #1f2937;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .custom-legend {
+                position: static;
+                transform: none;
+                max-width: 100%;
+                margin-top: 20px;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .modal {
+                margin: 0;
+                border-radius: 0;
+                max-height: 100vh;
+            }
+
+            .link-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="top-header">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            THUNDERCAT
+        </div>
+        <div style="font-size: 14px; color: #6b7280;">
+            Logged in as: <strong>annaliese.walsten@frontgatetickets.com</strong>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header" onclick="toggleDashboards()">
+                <span>Dashboards</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="dashboardsChevron" style="transition: transform 0.2s;">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </div>
+            <div class="sidebar-submenu" id="dashboardsSubmenu">
+                <div class="sidebar-item active">Scan Insights</div>
+                <div class="sidebar-item">Shareable Links</div>
+            </div>
+            <div class="sidebar-item">Festivals</div>
+            <div class="sidebar-item">Assets</div>
+            <div class="sidebar-item">Users</div>
+            <div class="sidebar-item">Admin</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <a href="#" style="color: #6b7280; text-decoration: none;">Home</a>
+                <span>›</span>
+                <a href="#" style="color: #6b7280; text-decoration: none;">Dashboards</a>
+            </div>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Scan Insights</h1>
+                <button class="share-button" onclick="openShareModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3"/>
+                        <circle cx="6" cy="12" r="3"/>
+                        <circle cx="18" cy="19" r="3"/>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                    Share Dashboard
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-container">
+                <select class="filter-select">
+                    <option>Bonnaroo</option>
+                    <option>Coachella</option>
+                    <option>Lollapalooza</option>
+                </select>
+
+                <div class="date-range-display">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span>6/11/2026 12:00 PM - 6/14/2026 12:00 PM</span>
+                </div>
+
+                <select class="filter-select">
+                    <option>Custom Range</option>
+                    <option>Today</option>
+                    <option>Yesterday</option>
+                    <option>Last 7 Days</option>
+                </select>
+
+                <select class="filter-select">
+                    <option>US/Central</option>
+                    <option>US/Eastern</option>
+                    <option>US/Pacific</option>
+                </select>
+
+                <a href="#" class="clear-link">Clear</a>
+            </div>
+
+            <!-- Venue Population -->
+            <div class="metric-card">
+                <div class="metric-label">Venue Population</div>
+                <div class="metric-value">3,630</div>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2 class="chart-title">Scans By Groupset</h2>
+                    <div class="chart-actions">
+                        <button class="download-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                        </button>
+                        <label class="legend-toggle">
+                            <input type="checkbox" checked id="legendToggle">
+                            <span>Groupset</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <canvas id="scanChart"></canvas>
+                    <div class="custom-legend" id="customLegend"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="shareModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Share Dashboard</h2>
+                <button class="close-btn" onclick="closeShareModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Dashboard Info Box -->
+                <div style="background: #f0f4ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                        <strong style="color: #1e40af;">Dashboard to Share</strong>
+                    </div>
+                    <div style="font-size: 18px; font-weight: 600; color: #1f2937; margin-bottom: 4px;">
+                        Scan Insights Dashboard
+                    </div>
+                    <div style="font-size: 13px; color: #6b7280;">
+                        Festival: <strong>Bonnaroo 2026</strong> (ID: 56)
+                    </div>
+                </div>
+
+                <!-- Link Generated Success (shown after generation) -->
+                <div class="link-generated" id="linkGenerated">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Link Generated Successfully!
+                    </h3>
+                    <div class="link-display" id="generatedLink">
+                        https://share.fgt.com/scan-insights/SHLNK-2026-56-a8f3c9e1
+                    </div>
+                    <div class="link-actions">
+                        <button class="btn btn-success" onclick="copyLink()" id="copyBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                            </svg>
+                            <span id="copyBtnText">Copy Link</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="openEmailTab()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                            Send via Email
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="tab-group" id="tabGroup">
+                    <button class="tab active" onclick="switchTab('generate')">Generate Link</button>
+                    <button class="tab" onclick="switchTab('email')" id="emailTab">Send via Email</button>
+                </div>
+
+                <!-- Generate Link Tab -->
+                <div class="tab-content active" id="generateContent">
+                    <div class="info-box">
+                        <strong>Current Dashboard Filters Will Be Captured</strong>
+                        These filters will be pre-selected when the external user opens the link. They can modify filters after opening.
+                    </div>
+
+                    <div class="captured-filters">
+                        <strong style="font-size: 12px; color: #6b7280; margin-bottom: 8px; display: block;">CAPTURED FILTERS:</strong>
+                        <span class="filter-tag">Festival: Bonnaroo (ID: 56)</span>
+                        <span class="filter-tag">Date: 6/11/2026 - 6/14/2026</span>
+                        <span class="filter-tag">Timezone: US/Central</span>
+                        <span class="filter-tag">Preset: Custom Range</span>
+                    </div>
+
+                    <div class="form-section" style="margin-top: 24px;">
+                        <div class="section-title">Link Settings</div>
+
+                        <div class="form-group">
+                            <label>Expiration Date</label>
+                            <input type="date" id="expirationDate" value="2026-08-11">
+                            <div class="form-hint">Default: 28 days from today (TM standard)</div>
+                        </div>
+
+                        <div class="form-group pin-toggle">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="enablePin" onchange="togglePinInput()">
+                                <label for="enablePin">Require PIN for access (optional)</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="pinInputGroup" style="display: none;">
+                            <label>4-Digit PIN</label>
+                            <div class="pin-input-group">
+                                <input type="text" class="pin-digit" maxlength="1" id="pin1">
+                                <input type="text" class="pin-digit" maxlength="1" id="pin2">
+                                <input type="text" class="pin-digit" maxlength="1" id="pin3">
+                                <input type="text" class="pin-digit" maxlength="1" id="pin4">
+                            </div>
+                            <div class="form-hint">External users will need this PIN to access the dashboard</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Internal Note (optional)</label>
+                            <textarea placeholder="e.g., 'Shared with Live Nation team for post-event review'"></textarea>
+                            <div class="form-hint">For internal tracking only, not visible to external users</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Tab -->
+                <div class="tab-content" id="emailContent">
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label>Recipient Email(s)</label>
+                            <input type="email" placeholder="client@example.com" id="recipientEmail">
+                            <div class="form-hint">Separate multiple emails with commas</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <input type="text" value="Scan Insights Report - Bonnaroo 2026">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea placeholder="Add a personal message...">Hi,
+
+I'm sharing the Scan Insights dashboard for Bonnaroo 2026. You can view real-time scan data and analytics through this link.
+
+The link will expire on August 11, 2026.
+
+Best regards</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeShareModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="generateLink()" id="generateBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3"/>
+                        <circle cx="6" cy="12" r="3"/>
+                        <circle cx="18" cy="19" r="3"/>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                    <span id="generateBtnText">Generate Link</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Chart
+        const groupsets = [
+            { name: '08. Tower Entrance', color: '#6366f1' },
+            { name: '07. Arch Entrance', color: '#f97316' },
+            { name: '01. West Toll', color: '#22c55e' },
+            { name: '31. VIP Lounge West', color: '#ef4444' },
+            { name: '03. Back 60 Toll', color: '#8b5cf6' },
+            { name: '29. GA+ Lounge', color: '#ec4899' },
+            { name: "05. Eddie's Road", color: '#f59e0b' },
+            { name: '12. 4th Ave BOH Access', color: '#9ca3af' },
+            { name: '30. VIP Lounge East', color: '#84cc16' },
+            { name: '16. Main Stage-StgR BOH F', color: '#06b6d4' }
+        ];
+
+        function generateTimeSeriesData(startDate, endDate, groupsetIndex) {
+            const data = [];
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const hoursDiff = (end - start) / (1000 * 60 * 60);
+
+            for (let i = 0; i <= hoursDiff; i++) {
+                const time = new Date(start.getTime() + i * 60 * 60 * 1000);
+                let value;
+
+                if (groupsetIndex === 0) {
+                    value = 1000 + Math.sin(i / 8) * 1500 + Math.random() * 500;
+                } else if (groupsetIndex === 1) {
+                    value = 800 + Math.cos(i / 6) * 1800 + Math.random() * 600;
+                } else if (groupsetIndex === 2) {
+                    value = 200 + Math.sin(i / 10) * 300 + Math.random() * 200;
+                } else if (groupsetIndex === 3) {
+                    value = 100 + Math.sin(i / 12) * 150 + Math.random() * 100;
+                } else {
+                    value = 50 + Math.sin(i / 15) * 100 + Math.random() * 80;
+                }
+
+                data.push({ x: time, y: Math.max(0, value) });
+            }
+
+            return data;
+        }
+
+        const datasets = groupsets.map((groupset, index) => ({
+            label: groupset.name,
+            data: generateTimeSeriesData('2026-06-11T12:00:00', '2026-06-14T12:00:00', index),
+            borderColor: groupset.color,
+            backgroundColor: groupset.color,
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            fill: false
+        }));
+
+        const ctx = document.getElementById('scanChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: { datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        callbacks: {
+                            title: function(context) {
+                                return new Date(context[0].parsed.x).toLocaleString();
+                            },
+                            label: function(context) {
+                                return context.dataset.label + ': ' + Math.round(context.parsed.y).toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                            displayFormats: { day: 'MM-dd hh:mm a' }
+                        },
+                        grid: { color: '#f3f4f6' },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45,
+                            color: '#6b7280',
+                            font: { size: 11 }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 5000,
+                        grid: { color: '#f3f4f6' },
+                        ticks: {
+                            color: '#6b7280',
+                            font: { size: 11 },
+                            callback: value => value.toLocaleString()
+                        }
+                    }
+                }
+            }
+        });
+
+        // Generate legend
+        const legendContainer = document.getElementById('customLegend');
+        groupsets.forEach((groupset, index) => {
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+            item.innerHTML = `
+                <div class="legend-color" style="background-color: ${groupset.color}"></div>
+                <span>${groupset.name}</span>
+            `;
+            item.addEventListener('click', function() {
+                const dataset = chart.data.datasets[index];
+                dataset.hidden = !dataset.hidden;
+                this.style.opacity = dataset.hidden ? '0.4' : '1';
+                chart.update();
+            });
+            legendContainer.appendChild(item);
+        });
+
+        document.getElementById('legendToggle').addEventListener('change', function(e) {
+            legendContainer.style.display = e.target.checked ? 'flex' : 'none';
+        });
+
+        function toggleDashboards() {
+            const submenu = document.getElementById('dashboardsSubmenu');
+            const chevron = document.getElementById('dashboardsChevron');
+
+            if (submenu.style.display === 'none') {
+                submenu.style.display = 'block';
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                submenu.style.display = 'none';
+                chevron.style.transform = 'rotate(-90deg)';
+            }
+        }
+
+        function openShareModal() {
+            document.getElementById('shareModal').classList.add('show');
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('show');
+            // Reset form
+            setTimeout(() => {
+                document.getElementById('linkGenerated').classList.remove('show');
+                document.getElementById('tabGroup').style.display = 'flex';
+                switchTab('generate');
+            }, 300);
+        }
+
+        function switchTab(tab) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            if (tab === 'generate') {
+                document.querySelector('.tab:first-child').classList.add('active');
+                document.getElementById('generateContent').classList.add('active');
+                document.getElementById('generateBtn').innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3"/>
+                        <circle cx="6" cy="12" r="3"/>
+                        <circle cx="18" cy="19" r="3"/>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                    <span id="generateBtnText">Generate Link</span>
+                `;
+                document.getElementById('generateBtn').onclick = generateLink;
+            } else if (tab === 'email') {
+                document.getElementById('emailTab').classList.add('active');
+                document.getElementById('emailContent').classList.add('active');
+                document.getElementById('generateBtn').innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                    <span id="generateBtnText">Send Email</span>
+                `;
+                document.getElementById('generateBtn').onclick = sendEmail;
+            }
+        }
+
+        function togglePinInput() {
+            const enabled = document.getElementById('enablePin').checked;
+            const pinGroup = document.getElementById('pinInputGroup');
+            pinGroup.style.display = enabled ? 'block' : 'none';
+
+            if (enabled) {
+                document.getElementById('pin1').focus();
+            }
+        }
+
+        function generateLink() {
+            // Simulate link generation
+            const linkGenerated = document.getElementById('linkGenerated');
+            const tabGroup = document.getElementById('tabGroup');
+
+            linkGenerated.classList.add('show');
+            tabGroup.style.display = 'none';
+
+            // Hide generate content
+            document.getElementById('generateContent').style.display = 'none';
+
+            // Scroll to top of modal
+            document.querySelector('.modal').scrollTop = 0;
+        }
+
+        function copyLink() {
+            const link = document.getElementById('generatedLink').textContent;
+            navigator.clipboard.writeText(link);
+
+            const btn = document.getElementById('copyBtn');
+            const btnText = document.getElementById('copyBtnText');
+
+            btn.classList.add('copied');
+            btnText.textContent = 'Copied!';
+
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btnText.textContent = 'Copy Link';
+            }, 2000);
+        }
+
+        function openEmailTab() {
+            switchTab('email');
+            document.getElementById('linkGenerated').classList.remove('show');
+            document.getElementById('tabGroup').style.display = 'flex';
+            document.getElementById('generateContent').style.display = 'none';
+            document.getElementById('emailContent').style.display = 'block';
+
+            // Pre-fill the link in email message
+            const textarea = document.querySelector('#emailContent textarea');
+            textarea.value = textarea.value + '\n\nLink: ' + document.getElementById('generatedLink').textContent;
+        }
+
+        function sendEmail() {
+            const email = document.getElementById('recipientEmail').value;
+            if (!email) {
+                alert('Please enter a recipient email address');
+                return;
+            }
+
+            // Simulate sending
+            alert('Email sent successfully to: ' + email);
+            closeShareModal();
+        }
+
+        // PIN input auto-focus
+        const pinInputs = ['pin1', 'pin2', 'pin3', 'pin4'];
+        pinInputs.forEach((id, index) => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    if (e.target.value.length === 1 && index < 3) {
+                        document.getElementById(pinInputs[index + 1]).focus();
+                    }
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        document.getElementById(pinInputs[index - 1]).focus();
+                    }
+                });
+            }
+        });
+
+        // Close modal on overlay click
+        document.getElementById('shareModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeShareModal();
+            }
+        });
+    </script>
+</body>
+</html>

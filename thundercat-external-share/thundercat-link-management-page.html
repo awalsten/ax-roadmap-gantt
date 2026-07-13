@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shareable Links Management - Thundercat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+            color: #1f2937;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #1f2937;
+            clip-path: polygon(0% 50%, 25% 0%, 50% 50%, 25% 100%);
+        }
+
+        /* Sidebar */
+        .app-container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 220px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 16px;
+        }
+
+        .sidebar-item {
+            padding: 10px 16px;
+            font-size: 14px;
+            color: #4b5563;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: background 0.2s;
+        }
+
+        .sidebar-item:hover {
+            background: #f3f4f6;
+        }
+
+        .sidebar-item.active {
+            background: #f3f4f6;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 32px 40px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        /* Filters */
+        .filters-bar {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 10px 36px 10px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 16px 10px 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='11' cy='11' r='8' stroke='%236B7280' stroke-width='2'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65' stroke='%236B7280' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat 12px center;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px;
+            font-size: 14px;
+            color: #1f2937;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.expired {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.revoked {
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-badge.active .status-dot {
+            background: #10b981;
+        }
+
+        .status-badge.expired .status-dot {
+            background: #ef4444;
+        }
+
+        .status-badge.revoked .status-dot {
+            background: #6b7280;
+        }
+
+        /* Link Display */
+        .link-text {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #667eea;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .icon-btn.copy:hover {
+            background: #eff6ff;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .icon-btn.edit:hover {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .icon-btn.revoke:hover {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .pin-display {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .pin-box {
+            width: 50px;
+            height: 60px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 64px 32px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input {
+                min-width: 100%;
+            }
+
+            .table-wrapper {
+                overflow-x: scroll;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            THUNDERCAT
+        </div>
+        <div style="font-size: 14px; color: #6b7280;">
+            Logged in as: <strong>annaliese.walsten@frontgatetickets.com</strong>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header" style="padding: 10px 16px; font-weight: 600; color: #1f2937; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-radius: 6px;" onclick="toggleDashboards()">
+                <span>Dashboards</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="dashboardsChevron" style="transition: transform 0.2s;">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </div>
+            <div id="dashboardsSubmenu" style="margin-left: 16px;">
+                <div class="sidebar-item">Scan Insights</div>
+                <div class="sidebar-item active">Shareable Links</div>
+            </div>
+            <div class="sidebar-item">Festivals</div>
+            <div class="sidebar-item">Assets</div>
+            <div class="sidebar-item">Users</div>
+            <div class="sidebar-item">Admin</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Shareable Links</h1>
+                <p class="page-subtitle">Manage external access to dashboards and reports</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Links</div>
+                    <div class="stat-value">24</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active</div>
+                    <div class="stat-value" style="color: #10b981;">18</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Expired</div>
+                    <div class="stat-value" style="color: #ef4444;">4</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Revoked</div>
+                    <div class="stat-value" style="color: #6b7280;">2</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <select class="filter-select">
+                    <option>All Status</option>
+                    <option>Active</option>
+                    <option>Expired</option>
+                    <option>Revoked</option>
+                </select>
+
+                <select class="filter-select">
+                    <option>All Festivals</option>
+                    <option>Bonnaroo 2026</option>
+                    <option>Coachella 2026</option>
+                    <option>Lollapalooza 2026</option>
+                </select>
+
+                <select class="filter-select">
+                    <option>All Creators</option>
+                    <option>Annaliese Walsten</option>
+                    <option>John Smith</option>
+                    <option>Jane Doe</option>
+                </select>
+
+                <input type="text" class="search-input" placeholder="Search by link ID, festival, or note...">
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Link ID</th>
+                                <th>Festival</th>
+                                <th>Dashboard</th>
+                                <th>Created By</th>
+                                <th>Created</th>
+                                <th>Expires</th>
+                                <th>PIN</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="link-text">SHLNK-2026-56-a8f3c9e1</div>
+                                </td>
+                                <td><strong>Bonnaroo 2026</strong></td>
+                                <td>Scan Insights</td>
+                                <td>Annaliese Walsten</td>
+                                <td>Jul 13, 2026 2:15 PM</td>
+                                <td>Aug 11, 2026</td>
+                                <td>
+                                    <span style="font-size: 12px; color: #10b981; font-weight: 600;">✓ Set</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge active">
+                                        <span class="status-dot"></span>
+                                        Active
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="icon-btn copy" title="Copy Link" onclick="copyLink('SHLNK-2026-56-a8f3c9e1')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn edit" title="Edit Settings" onclick="editLink('SHLNK-2026-56-a8f3c9e1')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn revoke" title="Revoke Link" onclick="revokeLink('SHLNK-2026-56-a8f3c9e1')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                                <line x1="9" y1="9" x2="15" y2="15"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="link-text">SHLNK-2026-58-b2d4e6f8</div>
+                                </td>
+                                <td><strong>Coachella 2026</strong></td>
+                                <td>Scan Insights</td>
+                                <td>John Smith</td>
+                                <td>Jul 10, 2026 9:30 AM</td>
+                                <td>Aug 8, 2026</td>
+                                <td>
+                                    <span style="font-size: 12px; color: #9ca3af;">None</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge active">
+                                        <span class="status-dot"></span>
+                                        Active
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="icon-btn copy" title="Copy Link" onclick="copyLink('SHLNK-2026-58-b2d4e6f8')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn edit" title="Edit Settings" onclick="editLink('SHLNK-2026-58-b2d4e6f8')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn revoke" title="Revoke Link" onclick="revokeLink('SHLNK-2026-58-b2d4e6f8')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                                <line x1="9" y1="9" x2="15" y2="15"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="link-text">SHLNK-2026-42-c3e5f7g9</div>
+                                </td>
+                                <td><strong>Lollapalooza 2026</strong></td>
+                                <td>Scan Insights</td>
+                                <td>Annaliese Walsten</td>
+                                <td>Jun 15, 2026 4:45 PM</td>
+                                <td>Jul 1, 2026</td>
+                                <td>
+                                    <span style="font-size: 12px; color: #10b981; font-weight: 600;">✓ Set</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge expired">
+                                        <span class="status-dot"></span>
+                                        Expired
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="icon-btn copy" title="Copy Link" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn edit" title="Edit Settings" onclick="editLink('SHLNK-2026-42-c3e5f7g9')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn" title="Delete" onclick="deleteLink('SHLNK-2026-42-c3e5f7g9')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="3 6 5 6 21 6"/>
+                                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="link-text">SHLNK-2026-39-d4f6h8j0</div>
+                                </td>
+                                <td><strong>Bonnaroo 2026</strong></td>
+                                <td>Scan Insights</td>
+                                <td>Jane Doe</td>
+                                <td>Jun 20, 2026 11:20 AM</td>
+                                <td>Jul 20, 2026</td>
+                                <td>
+                                    <span style="font-size: 12px; color: #9ca3af;">None</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge revoked">
+                                        <span class="status-dot"></span>
+                                        Revoked
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="icon-btn copy" title="Copy Link" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn" title="View Details" onclick="viewDetails('SHLNK-2026-39-d4f6h8j0')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn" title="Delete" onclick="deleteLink('SHLNK-2026-39-d4f6h8j0')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="3 6 5 6 21 6"/>
+                                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Link Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Edit Link Settings</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Link ID</label>
+                    <input type="text" value="SHLNK-2026-56-a8f3c9e1" disabled style="background: #f9fafb;">
+                </div>
+
+                <div class="form-group">
+                    <label>Expiration Date</label>
+                    <input type="date" value="2026-08-11" id="editExpiration">
+                </div>
+
+                <div class="form-group">
+                    <label>PIN (leave empty to remove)</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" placeholder="1234" maxlength="4" id="editPin" style="flex: 1;">
+                        <button class="btn btn-secondary" onclick="viewPin()">View Current PIN</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Internal Note</label>
+                    <textarea style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-family: inherit; min-height: 80px;">Shared with Live Nation team for post-event review</textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View PIN Modal -->
+    <div class="modal-overlay" id="pinModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Current PIN</h2>
+            </div>
+            <div class="modal-body">
+                <div class="pin-display">
+                    <div class="pin-box">1</div>
+                    <div class="pin-box">2</div>
+                    <div class="pin-box">3</div>
+                    <div class="pin-box">4</div>
+                </div>
+                <p style="text-align: center; color: #6b7280; font-size: 14px;">
+                    This PIN is required for external users to access the dashboard
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('pinModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revoke Confirmation Modal -->
+    <div class="modal-overlay" id="revokeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Revoke Link?</h2>
+            </div>
+            <div class="modal-body">
+                <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
+                    Are you sure you want to revoke this shareable link? This action will immediately prevent external users from accessing the dashboard.
+                </p>
+                <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin-top: 12px;">
+                    <strong>Link ID:</strong> <code id="revokeId" style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px;"></code>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('revokeModal')">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmRevoke()">Revoke Link</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyLink(linkId) {
+            const link = `https://share.fgt.com/scan-insights/${linkId}`;
+            navigator.clipboard.writeText(link);
+
+            // Visual feedback
+            event.target.closest('button').style.background = '#10b981';
+            event.target.closest('button').style.color = 'white';
+            setTimeout(() => {
+                event.target.closest('button').style.background = '';
+                event.target.closest('button').style.color = '';
+            }, 1000);
+        }
+
+        function editLink(linkId) {
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        function viewPin() {
+            document.getElementById('pinModal').classList.add('show');
+        }
+
+        function revokeLink(linkId) {
+            document.getElementById('revokeId').textContent = linkId;
+            document.getElementById('revokeModal').classList.add('show');
+        }
+
+        function confirmRevoke() {
+            alert('Link has been revoked successfully');
+            closeModal('revokeModal');
+            // Reload page or update table
+            location.reload();
+        }
+
+        function deleteLink(linkId) {
+            if (confirm('Are you sure you want to permanently delete this link?')) {
+                alert('Link deleted successfully');
+                location.reload();
+            }
+        }
+
+        function viewDetails(linkId) {
+            alert('View details for: ' + linkId);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function saveChanges() {
+            alert('Changes saved successfully');
+            closeModal('editModal');
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal(this.id);
+                }
+            });
+        });
+
+        function toggleDashboards() {
+            const submenu = document.getElementById('dashboardsSubmenu');
+            const chevron = document.getElementById('dashboardsChevron');
+
+            if (submenu.style.display === 'none') {
+                submenu.style.display = 'block';
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                submenu.style.display = 'none';
+                chevron.style.transform = 'rotate(-90deg)';
+            }
+        }
+    </script>
+</body>
+</html>
